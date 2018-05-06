@@ -9,79 +9,154 @@ import java.util.Map.Entry;
 import Domain.ConceptLatticeGrid;
 import Domain.WeChatMessage;
 import HierarchicalRelationshipModel.HierarchicalRelationshipTool;
+
 /*
  * author:Pompeii
- * time:
+ * time:0506
  * 作用：生成概念格，并以表的形式保存起来
  * 输入：
  * 输出：
- * 完成度：10%
+ * 完成度：60%
  * */
-public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshipTool{
+public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshipTool {
 
 	@Override
-	public ArrayList<ArrayList<ConceptLatticeGrid>> getHierarchicalRelationship(HashMap<Integer,WeChatMessage> messageMap,
-			HashMap<String,HashSet<Integer>> facetTermOnDocIDs,
-			HashMap<Integer,HashSet<String>> docIDOnFacets) {
+	public ArrayList<ArrayList<ConceptLatticeGrid>> getHierarchicalRelationship(
+			HashMap<Integer, WeChatMessage> messageMap, HashMap<String, HashSet<Integer>> facetTermOnDocIDs,
+			HashMap<Integer, HashSet<String>> docIDOnFacets) {
 		ArrayList<ArrayList<ConceptLatticeGrid>> conceptLatticeGridList = new ArrayList<ArrayList<ConceptLatticeGrid>>();
-		int countOfDocs = docIDOnFacets.size();
-		//给每个列表加上一个null的列表，最上层是节点数最少的层
-		for(int index = countOfDocs; index > 0; index--) {
+		int countOfDocs = docIDOnFacets.size();		//一共有的文本的数量
+		// 给每个列表加上一个null的列表，最上层是节点数最少的层，conceptLatticeGridList中包含的List共有countOfDocs个。
+		for (int index = countOfDocs; index > 0; index--) {
 			ArrayList<ConceptLatticeGrid> tmp = new ArrayList<ConceptLatticeGrid>();
 			conceptLatticeGridList.add(tmp);
 		}
-		
-		//HashSet<Integer> setOfFullDocs = (HashSet<Integer>) docIDOnFacets.keySet();
-		Iterator<Entry<String,HashSet<Integer>>> iterOfFacetTermOnDocIDs = facetTermOnDocIDs.entrySet().iterator();
-		//从最多的节点那一层开始装
-		for(int index = countOfDocs - 1; index >= 0; index--) {
+
+		// HashSet<Integer> setOfFullDocs = (HashSet<Integer>) docIDOnFacets.keySet();
+		Iterator<Entry<String, HashSet<Integer>>> iterOfFacetTermOnDocIDs = facetTermOnDocIDs.entrySet().iterator();
+		//将查询集为单个String的grid放到对应的level中去，grid的资源集的size（）-1对应level。
+		while(iterOfFacetTermOnDocIDs.hasNext()) {
+			Entry<String, HashSet<Integer>> entryOfFacetTermOnDocIDs = iterOfFacetTermOnDocIDs.next();
 			ArrayList<ConceptLatticeGrid> tmpList = new ArrayList<ConceptLatticeGrid>();
-			//将每一层装入到对应的层次中去，但是还没能进行每一层的节点的相交
-			while(iterOfFacetTermOnDocIDs.hasNext()) {
-				HashSet<String> tmpQuests = new HashSet<String>();
-				HashSet<Integer> tmpResources = new HashSet<Integer>();
-				ConceptLatticeGrid tmpGrid = new ConceptLatticeGrid();
-				Entry<String,HashSet<Integer>> entryOfFacetTermOnDocIDs = iterOfFacetTermOnDocIDs.next();
-				//只将单元素的查询构建了，还没有做相交的操作
-				if(entryOfFacetTermOnDocIDs.getValue().size() == index) {
-					tmpQuests.add(entryOfFacetTermOnDocIDs.getKey());
-					tmpResources.addAll(entryOfFacetTermOnDocIDs.getValue());
-				}
-				tmpGrid.setQuest(tmpQuests);
-				tmpGrid.setResourcesIds(tmpResources);
-				tmpList = conceptLatticeGridList.get(index);
-				tmpList.add(tmpGrid);				//还没有进行冗余检查和父节点查询
-			}
-			
-			tmpList = conceptLatticeGridList.get(index);
-			//冗余检查，冗余合并
-			tmpList = redundanceCheck(tmpList,index);
-			//去掉每一层中quest为null的节点
-			tmpList = removeNullGrid(tmpList,index);			
+			ConceptLatticeGrid tmpConceptLatticeGrid = new ConceptLatticeGrid();
+			HashSet<String> tmpQuests = new HashSet<String>();
+			HashSet<Integer> tmpResources = new HashSet<Integer>();
+			tmpQuests.add(entryOfFacetTermOnDocIDs.getKey());
+			tmpResources.addAll(tmpResources);
+			tmpConceptLatticeGrid.setQuest(tmpQuests);
+			tmpConceptLatticeGrid.setResourcesIds(tmpResources);
+			tmpList = conceptLatticeGridList.get(tmpResources.size() - 1);
+			tmpList.add(tmpConceptLatticeGrid);
+			conceptLatticeGridList.set(tmpResources.size() - 1, tmpList);
 		}
 		
+		//冗余检查和冗余合并
+		for(int index = 0; index < countOfDocs; index++) {
+			ArrayList<ConceptLatticeGrid> tmpList = new ArrayList<ConceptLatticeGrid>();
+			tmpList = conceptLatticeGridList.get(index);
+			tmpList = redundanceCheck(tmpList,index);
+			conceptLatticeGridList.set(index, tmpList);
+		}
+		
+		
+		// 从最多的节点那一层开始装，这个循环只装进去了每一层的单个查询的grid。
+		for (int index = countOfDocs - 1; index >= 0; index--) {
+			ArrayList<ConceptLatticeGrid> tmpList = new ArrayList<ConceptLatticeGrid>();
+			// 将每一层装入到对应的层次中去，但是还没能进行每一层的节点的相交
+			while (iterOfFacetTermOnDocIDs.hasNext()) {
+				Entry<String, HashSet<Integer>> entryOfFacetTermOnDocIDs = iterOfFacetTermOnDocIDs.next();
+				// 只将单元素的查询构建了，还没有做相交的操作
+				if ((entryOfFacetTermOnDocIDs.getValue().size() - 1) == index) {	//因为countOfDocs - 1层里面装的是资源数为countOfDocs的节点
+					HashSet<String> tmpQuests = new HashSet<String>();
+					HashSet<Integer> tmpResources = new HashSet<Integer>();
+					ConceptLatticeGrid tmpGrid = new ConceptLatticeGrid();
+					tmpQuests.add(entryOfFacetTermOnDocIDs.getKey());
+					tmpResources.addAll(entryOfFacetTermOnDocIDs.getValue());
+					tmpGrid.setQuest(tmpQuests);
+					tmpGrid.setResourcesIds(tmpResources);
+					tmpList.add(tmpGrid); 
+					// 还没有进行冗余检查和父节点查询
+				}
+			}
+			tmpList = conceptLatticeGridList.get(index);
+			// 去掉每一层中quest为null的节点，先去掉空节点可以避免出现空指针错误。
+			tmpList = removeNullGrid(tmpList, index);
+			// 冗余检查，冗余合并
+			tmpList = redundanceCheck(tmpList, index);
+			conceptLatticeGridList.set(index, tmpList);
+		}
+		
+		
+		//这一个循环将装进去相交之后的节点。
 		//子节点生成，并添加到相应的层次中去
-		
-		//寻找父节点，将List变成Hasse图
-		
-		//以下仅为去除警告，正确实现的时候并无作用，需要去掉
+		for (int index = countOfDocs - 1; index >= 0; index--) {
+			ArrayList<ConceptLatticeGrid> tmpList = new ArrayList<ConceptLatticeGrid>();
+			int numOfThisLevelList = tmpList.size();			//装本level的节点数，最后如果节点数变化了，就重新在这一层循环一次
+			tmpList = conceptLatticeGridList.get(index);
+			if(index == countOfDocs - 1 && tmpList.size() == 0) {
+				
+			}
+			// 将每一层装入到对应的层次中去，但是还没能进行每一层的节点的相交
+			for(ConceptLatticeGrid element:tmpList) {
+				for(ConceptLatticeGrid element1:tmpList) {
+					if(element.equals(element1)) {
+						//相同则不做任何事
+					}else {
+						//不同则相交，如果相交之后的资源集不为空，则加入至相应的level的List中去
+						HashSet<String> tmpQuests = new HashSet<String>();
+						tmpQuests.addAll(element.getQuest());
+						for(String element2:element1.getQuest()) {
+							tmpQuests.add(element2);
+						}
+						HashSet<Integer> tmpResources = new HashSet<Integer>();
+						for(Integer element3:element1.getResourcesIds()) {
+							if(element1.getResourcesIds().contains(element3)) {
+								tmpResources.add(element3);
+							}
+						}
+						if(!tmpResources.isEmpty()) {					//资源集不能为空
+							ConceptLatticeGrid tmpGrid = new ConceptLatticeGrid();
+							tmpGrid.setQuest(tmpQuests);
+							tmpGrid.setResourcesIds(tmpResources);
+							ArrayList<ConceptLatticeGrid> levelList = conceptLatticeGridList.get(tmpResources.size()); //对应的level的列表
+							levelList.add(tmpGrid);
+							conceptLatticeGridList.set(tmpResources.size(), levelList);
+						}
+					}
+				}
+			}
+			// 冗余检查，冗余合并
+			tmpList = redundanceCheck(tmpList, index);
+			conceptLatticeGridList.set(index, tmpList);
+			if(numOfThisLevelList == tmpList.size()) {
+				//数量一致，则什么都不做。
+			}else {
+				index++; //将index+1，则会重新对这一层进行这一波操作
+			}
+		}
+
+		// 寻找父节点，将List变成Hasse图
+		for(int index = 0; index < countOfDocs; index--) {
+			
+		}
+		// 以下仅为去除警告，正确实现的时候并无作用，需要去掉
 		return conceptLatticeGridList;
 	}
-	
-	//冗余检查，并将该level冗余的概念格合并
-	private static ArrayList<ConceptLatticeGrid> redundanceCheck(ArrayList<ConceptLatticeGrid> levelList,int level) {
+
+	// 冗余检查，并将该level冗余的概念格合并，需要检查，估计还会有bug。
+	private static ArrayList<ConceptLatticeGrid> redundanceCheck(ArrayList<ConceptLatticeGrid> levelList, int level) {
 		ArrayList<ConceptLatticeGrid> resultMap = new ArrayList<ConceptLatticeGrid>();
-		HashSet<HashSet<Integer>> resourcesSet = new HashSet<HashSet<Integer>>();			//存储已经遍历了的节点，并且只保存资源不同的查询节点的资源
-		
-		for(ConceptLatticeGrid element:levelList) {
-			if(!resourcesSet.contains(element.getResourcesIds())) {			//如果不包含该资源，直接加入即可
+		HashSet<HashSet<Integer>> resourcesSet = new HashSet<HashSet<Integer>>(); // 存储已经遍历了的节点，并且只保存资源不同的查询节点的资源
+
+		for (ConceptLatticeGrid element : levelList) {
+			if (!resourcesSet.contains(element.getResourcesIds())) {	// 如果不包含该资源，直接加入即可
 				resourcesSet.add(element.getResourcesIds());
 				resultMap.add(element);
-			}else {															//如果包含，那就找出所有资源为该资源的grid，将其查询Set合并。
+			} else { 													// 如果包含，那就找出所有资源为该资源的grid，将其查询Set合并。
 				ConceptLatticeGrid tmpGrid = new ConceptLatticeGrid();
 				HashSet<String> questsSet = new HashSet<String>();
-				for(ConceptLatticeGrid e:levelList) {
-					if(e.getResourcesIds().equals(element.getResourcesIds())) {
+				for (ConceptLatticeGrid e : levelList) {
+					if (e.getResourcesIds().equals(element.getResourcesIds())) {
 						questsSet.addAll(e.getQuest());
 					}
 				}
@@ -90,19 +165,20 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 				resultMap.add(tmpGrid);
 			}
 		}
+		
 		return resultMap;
 	}
-	
-	//去掉每一层的quest为空集的概念格
-	private static ArrayList<ConceptLatticeGrid> removeNullGrid(ArrayList<ConceptLatticeGrid> levelList,int level) {
+
+	// 去掉每一层的quest为空集的概念格，level地方有bug，需要重新更改
+	private static ArrayList<ConceptLatticeGrid> removeNullGrid(ArrayList<ConceptLatticeGrid> levelList, int level) {
 		ArrayList<ConceptLatticeGrid> resultMap = new ArrayList<ConceptLatticeGrid>();
-		if(level == 0) {
+		if (level == 0) {
 			return levelList;
-		}else {
-			for(ConceptLatticeGrid element:levelList) {
-				if(element.getQuest().equals(null)) {
-					
-				}else {
+		} else {
+			for (ConceptLatticeGrid element : levelList) {
+				if (null == element.getQuest()) {
+
+				} else {
 					resultMap.add(element);
 				}
 			}
