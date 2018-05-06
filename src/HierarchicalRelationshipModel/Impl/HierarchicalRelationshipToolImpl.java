@@ -93,13 +93,20 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 		return resultMap;
 	}
 	
-	//同一level的节点相交，得到子概念格和同一层的概念格
-	
 	//去掉每一层的quest为空集的概念格
 	private static ArrayList<ConceptLatticeGrid> removeNullGrid(ArrayList<ConceptLatticeGrid> levelList,int level) {
+		ArrayList<ConceptLatticeGrid> resultMap = new ArrayList<ConceptLatticeGrid>();
 		if(level == 0) {
 			return levelList;
+		}else {
+			for(ConceptLatticeGrid element:levelList) {
+				if(element.getQuest().equals(null)) {
+					
+				}else {
+					resultMap.add(element);
+				}
+			}
 		}
-		return null;
+		return resultMap;
 	}
 }
