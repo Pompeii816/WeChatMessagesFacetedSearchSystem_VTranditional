@@ -1,4 +1,4 @@
-package FacetTermsExtractorModel.Impl;
+package FacetTermExtractorModel.Impl;
 
 import java.util.HashMap;
 import java.util.HashSet;

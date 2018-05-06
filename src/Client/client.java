@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import Domain.ConceptLatticeGrid;
 import Domain.WeChatMessage;
 import FacetTermExtractorModel.FacetTermExtractor;
-import FacetTermsExtractorModel.Impl.BasedOnFrequencyFacetTermExtractorImpl;
+import FacetTermExtractorModel.Impl.BasedOnFrequencyFacetTermExtractorImpl;
 import HierarchicalRelationshipModel.HierarchicalRelationshipTool;
 import HierarchicalRelationshipModel.Impl.HierarchicalRelationshipToolImpl;
 import WordSplitModel.ChineseTextSegmentation;
