@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import Domain.ConceptLatticeGrid;
 import Domain.WeChatMessage;
@@ -33,7 +31,7 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 			conceptLatticeGridList.add(tmp);
 		}
 		
-		HashSet<Integer> setOfFullDocs = (HashSet<Integer>) docIDOnFacets.keySet();
+		//HashSet<Integer> setOfFullDocs = (HashSet<Integer>) docIDOnFacets.keySet();
 		Iterator<Entry<String,HashSet<Integer>>> iterOfFacetTermOnDocIDs = facetTermOnDocIDs.entrySet().iterator();
 		//从最多的节点那一层开始装
 		for(int index = countOfDocs - 1; index >= 0; index--) {
@@ -44,6 +42,7 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 				HashSet<Integer> tmpResources = new HashSet<Integer>();
 				ConceptLatticeGrid tmpGrid = new ConceptLatticeGrid();
 				Entry<String,HashSet<Integer>> entryOfFacetTermOnDocIDs = iterOfFacetTermOnDocIDs.next();
+				//只将单元素的查询构建了，还没有做相交的操作
 				if(entryOfFacetTermOnDocIDs.getValue().size() == index) {
 					tmpQuests.add(entryOfFacetTermOnDocIDs.getKey());
 					tmpResources.addAll(entryOfFacetTermOnDocIDs.getValue());
@@ -56,58 +55,51 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 			
 			tmpList = conceptLatticeGridList.get(index);
 			//冗余检查，冗余合并
-			//子节点生成，并添加到相应的层次中去
-			//寻找父节点，将List变成Hasse图
+			tmpList = redundanceCheck(tmpList,index);
+			//去掉每一层中quest为null的节点
+			tmpList = removeNullGrid(tmpList,index);			
 		}
 		
+		//子节点生成，并添加到相应的层次中去
 		
-		ConceptLatticeGrid root = new ConceptLatticeGrid();
-		HashSet<String> querySet = new HashSet<String>();
-		while(iterOfFacetTermOnDocIDs.hasNext()) {
-			Entry<String,HashSet<Integer>> entryOfFacetTermOnDocIDs = iterOfFacetTermOnDocIDs.next();
-			if(entryOfFacetTermOnDocIDs.getValue().containsAll(setOfFullDocs)) {
-				querySet.add(entryOfFacetTermOnDocIDs.getKey());
-			}
-		}
-		root.setQuest(querySet);
-		root.setResourcesIds(setOfFullDocs);
-		
-		ArrayList<ConceptLatticeGrid> rootList = new ArrayList<ConceptLatticeGrid>();
-		rootList.add(root);
-		conceptLatticeGridList.add(rootList);
-		
-		HashMap<HashSet<String>,HashSet<Integer>> allGrid = new HashMap<HashSet<String>,HashSet<Integer>>();
-		for(int index = 0; index < countOfDocs; index++) {
-			ArrayList<ConceptLatticeGrid> tmpList = new ArrayList<ConceptLatticeGrid>();
-			
-		}
+		//寻找父节点，将List变成Hasse图
 		
 		//以下仅为去除警告，正确实现的时候并无作用，需要去掉
-		redundanceCheck();
-		getSubList();
-		removeNullGrid();
-		getFatherGrid();
 		return conceptLatticeGridList;
 	}
 	
 	//冗余检查，并将该level冗余的概念格合并
-	private static List<ConceptLatticeGrid> redundanceCheck() {
+	private static ArrayList<ConceptLatticeGrid> redundanceCheck(ArrayList<ConceptLatticeGrid> levelList,int level) {
+		ArrayList<ConceptLatticeGrid> resultMap = new ArrayList<ConceptLatticeGrid>();
+		HashSet<HashSet<Integer>> resourcesSet = new HashSet<HashSet<Integer>>();			//存储已经遍历了的节点，并且只保存资源不同的查询节点的资源
 		
-		return null;
+		for(ConceptLatticeGrid element:levelList) {
+			if(!resourcesSet.contains(element.getResourcesIds())) {			//如果不包含该资源，直接加入即可
+				resourcesSet.add(element.getResourcesIds());
+				resultMap.add(element);
+			}else {															//如果包含，那就找出所有资源为该资源的grid，将其查询Set合并。
+				ConceptLatticeGrid tmpGrid = new ConceptLatticeGrid();
+				HashSet<String> questsSet = new HashSet<String>();
+				for(ConceptLatticeGrid e:levelList) {
+					if(e.getResourcesIds().equals(element.getResourcesIds())) {
+						questsSet.addAll(e.getQuest());
+					}
+				}
+				tmpGrid.setQuest(questsSet);
+				tmpGrid.setResourcesIds(element.getResourcesIds());
+				resultMap.add(tmpGrid);
+			}
+		}
+		return resultMap;
 	}
 	
 	//同一level的节点相交，得到子概念格和同一层的概念格
-	private static void getSubList() {
-		
-	}
 	
 	//去掉每一层的quest为空集的概念格
-	private static void removeNullGrid() {
-		
-	}
-	
-	//获取节点的父节点
-	private static void getFatherGrid() {
-		
+	private static ArrayList<ConceptLatticeGrid> removeNullGrid(ArrayList<ConceptLatticeGrid> levelList,int level) {
+		if(level == 0) {
+			return levelList;
+		}
+		return null;
 	}
 }
