@@ -33,11 +33,35 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 			conceptLatticeGridList.add(tmp);
 		}
 		
-		
-		
 		HashSet<Integer> setOfFullDocs = (HashSet<Integer>) docIDOnFacets.keySet();
-		ConceptLatticeGrid root = new ConceptLatticeGrid();
 		Iterator<Entry<String,HashSet<Integer>>> iterOfFacetTermOnDocIDs = facetTermOnDocIDs.entrySet().iterator();
+		//从最多的节点那一层开始装
+		for(int index = countOfDocs - 1; index >= 0; index--) {
+			ArrayList<ConceptLatticeGrid> tmpList = new ArrayList<ConceptLatticeGrid>();
+			//将每一层装入到对应的层次中去，但是还没能进行每一层的节点的相交
+			while(iterOfFacetTermOnDocIDs.hasNext()) {
+				HashSet<String> tmpQuests = new HashSet<String>();
+				HashSet<Integer> tmpResources = new HashSet<Integer>();
+				ConceptLatticeGrid tmpGrid = new ConceptLatticeGrid();
+				Entry<String,HashSet<Integer>> entryOfFacetTermOnDocIDs = iterOfFacetTermOnDocIDs.next();
+				if(entryOfFacetTermOnDocIDs.getValue().size() == index) {
+					tmpQuests.add(entryOfFacetTermOnDocIDs.getKey());
+					tmpResources.addAll(entryOfFacetTermOnDocIDs.getValue());
+				}
+				tmpGrid.setQuest(tmpQuests);
+				tmpGrid.setResourcesIds(tmpResources);
+				tmpList = conceptLatticeGridList.get(index);
+				tmpList.add(tmpGrid);				//还没有进行冗余检查和父节点查询
+			}
+			
+			tmpList = conceptLatticeGridList.get(index);
+			//冗余检查，冗余合并
+			//子节点生成，并添加到相应的层次中去
+			//寻找父节点，将List变成Hasse图
+		}
+		
+		
+		ConceptLatticeGrid root = new ConceptLatticeGrid();
 		HashSet<String> querySet = new HashSet<String>();
 		while(iterOfFacetTermOnDocIDs.hasNext()) {
 			Entry<String,HashSet<Integer>> entryOfFacetTermOnDocIDs = iterOfFacetTermOnDocIDs.next();

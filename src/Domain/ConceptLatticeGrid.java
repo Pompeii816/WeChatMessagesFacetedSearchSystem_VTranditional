@@ -6,17 +6,17 @@ import java.util.HashSet;
 public class ConceptLatticeGrid {
 	private HashSet<String> quest;
 	private HashSet<Integer> resourcesIds; 
-	private ConceptLatticeGrid fatherGrid;
+	private ArrayList<ConceptLatticeGrid> fatherGrid;
 	private ArrayList<ConceptLatticeGrid> childGrid;
 	
 	public ConceptLatticeGrid(HashSet<String> facetTermsName, HashSet<Integer> resourcesIds,
 			ArrayList<ConceptLatticeGrid> childGrid,
-			ConceptLatticeGrid fatherGrid) {
+			ArrayList<ConceptLatticeGrid> fatherGrid) {
 		super();
 		this.quest = facetTermsName;
 		this.resourcesIds = resourcesIds;
 		this.childGrid = childGrid;
-		this.setFatherGrid(fatherGrid);
+		this.fatherGrid = fatherGrid;
 	}
 
 	public ConceptLatticeGrid() {
@@ -47,11 +47,11 @@ public class ConceptLatticeGrid {
 		this.childGrid = childGrid;
 	}
 
-	public ConceptLatticeGrid getFatherGrid() {
+	public ArrayList<ConceptLatticeGrid> getFatherGrid() {
 		return fatherGrid;
 	}
 
-	public void setFatherGrid(ConceptLatticeGrid fatherGrid) {
+	public void setFatherGrid(ArrayList<ConceptLatticeGrid> fatherGrid) {
 		this.fatherGrid = fatherGrid;
 	}
 
