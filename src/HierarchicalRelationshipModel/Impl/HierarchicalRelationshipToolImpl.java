@@ -157,7 +157,6 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 				tmpGrid.setFatherGrid(fatherGrid);
 			}
 		}
-		// 以下仅为去除警告，正确实现的时候并无作用，需要去掉
 		return resultConceptLatticeGridList;
 	}
 
