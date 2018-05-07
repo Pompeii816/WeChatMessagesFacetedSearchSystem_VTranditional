@@ -124,10 +124,37 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 								tmpResources.add(element3);
 							}
 						}
+						ArrayList<ConceptLatticeGrid> tmpFatherConceptLatticeGrid = new ArrayList<ConceptLatticeGrid>();
+						
+						ArrayList<ConceptLatticeGrid> tmpChildConceptLatticeGrid = new ArrayList<ConceptLatticeGrid>();
+						
 						if(!tmpResources.isEmpty()) {					//资源集不能为空
 							ConceptLatticeGrid tmpGrid = new ConceptLatticeGrid();
 							tmpGrid.setQuest(tmpQuests);
 							tmpGrid.setResourcesIds(tmpResources);
+							//此处可以添加父节点和子节点集的关系.
+							tmpFatherConceptLatticeGrid.add(element1);
+							tmpFatherConceptLatticeGrid.add(element);
+							tmpGrid.setFatherGrid(tmpFatherConceptLatticeGrid);
+							
+							//添加子节点集和父节点集
+							if(null == element.getChildGrid()) {
+								tmpChildConceptLatticeGrid.add(tmpGrid);
+								element.setChildGrid(tmpChildConceptLatticeGrid);
+							}else {
+								tmpChildConceptLatticeGrid = element.getChildGrid();
+								tmpChildConceptLatticeGrid.add(tmpGrid);
+								element.setChildGrid(tmpChildConceptLatticeGrid);
+							}
+							if(null == element1.getChildGrid()) {
+								tmpChildConceptLatticeGrid.add(tmpGrid);
+								element1.setChildGrid(tmpChildConceptLatticeGrid);
+							}else {
+								tmpChildConceptLatticeGrid = element1.getChildGrid();
+								tmpChildConceptLatticeGrid.add(tmpGrid);
+								element1.setChildGrid(tmpChildConceptLatticeGrid);
+							}
+							
 							ArrayList<ConceptLatticeGrid> levelList = conceptLatticeGridList.get(tmpResources.size()); //对应的level的列表
 							levelList.add(tmpGrid);
 							conceptLatticeGridList.set(tmpResources.size(), levelList);
@@ -153,7 +180,7 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 		return conceptLatticeGridList;
 	}
 
-	// 冗余检查，并将该level冗余的概念格合并，需要检查，估计还会有bug。
+	// 冗余检查，并将该level冗余的概念格合并，还遗漏了将冗余合并之后的父节点集和子节点集的合并
 	private static ArrayList<ConceptLatticeGrid> redundanceCheck(ArrayList<ConceptLatticeGrid> levelList, int level) {
 		ArrayList<ConceptLatticeGrid> resultMap = new ArrayList<ConceptLatticeGrid>();
 		HashSet<HashSet<Integer>> resourcesSet = new HashSet<HashSet<Integer>>(); // 存储已经遍历了的节点，并且只保存资源不同的查询节点的资源
