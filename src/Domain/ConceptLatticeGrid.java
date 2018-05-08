@@ -4,15 +4,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class ConceptLatticeGrid {
+	private int ID;
 	private HashSet<String> quest;
 	private HashSet<Integer> resourcesIds; 
 	private ArrayList<ConceptLatticeGrid> fatherGrid;
 	private ArrayList<ConceptLatticeGrid> childGrid;
 	
-	public ConceptLatticeGrid(HashSet<String> facetTermsName, HashSet<Integer> resourcesIds,
+	public ConceptLatticeGrid(int ID,
+			HashSet<String> facetTermsName, HashSet<Integer> resourcesIds,
 			ArrayList<ConceptLatticeGrid> childGrid,
 			ArrayList<ConceptLatticeGrid> fatherGrid) {
 		super();
+		this.ID = ID;
 		this.quest = facetTermsName;
 		this.resourcesIds = resourcesIds;
 		this.childGrid = childGrid;
@@ -55,9 +58,18 @@ public class ConceptLatticeGrid {
 		this.fatherGrid = fatherGrid;
 	}
 
+	public int getID() {
+		return ID;
+	}
+
+	public void setID(int iD) {
+		ID = iD;
+	}
+
 	@Override
 	public String toString() {
-		return "ConceptLatticeGrid [quest=" + quest + ", resourcesIds=" + resourcesIds + ", fatherGrid=" + fatherGrid
-				+ ", childGrid=" + childGrid + "]";
+		return "ConceptLatticeGrid [ID=" + ID + ", quest=" + quest + ", resourcesIds=" + resourcesIds + ", fatherGrid="
+				+ fatherGrid + ", childGrid=" + childGrid + "]";
 	}
+	
 }

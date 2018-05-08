@@ -91,8 +91,8 @@ public class Tools {
 		set.toArray(setN);
 		return setN;
 	}
-	
-	//写入属性子集
+
+	// 写入属性子集
 	public static void getSubSet(Integer[] setN) throws IOException {
 		FileWriter writer = new FileWriter(new File("src/attrSubSet.txt"));
 		int length = setN.length;
@@ -109,8 +109,8 @@ public class Tools {
 		}
 		writer.close();
 	}
-	
-	//读取属性子集
+
+	// 读取属性子集
 	public static List<List<Integer>> attrSubSetList() throws NumberFormatException, IOException {
 		FileReader fileread = new FileReader(new File("src/attrSubSet.txt"));
 		BufferedReader buffread = new BufferedReader(fileread);
@@ -128,15 +128,12 @@ public class Tools {
 		return list;
 	}
 
-	//通过属性子集，获取对应的结果资源子集
+	// 通过属性子集，获取对应的结果资源子集
 	/*
-	 * 作用：通过属性子集，获取对应的结果资源子集
-	 * 输入：
-	 * List<List<Integer>> attrSubSetlist  属性子集的list
-	 * List<Map<Integer, List<Integer>>> attrObjList  属性-对象list
-	 * 输出：
+	 * 作用：通过属性子集，获取对应的结果资源子集 输入： List<List<Integer>> attrSubSetlist 属性子集的list
+	 * List<Map<Integer, List<Integer>>> attrObjList 属性-对象list 输出：
 	 * Map<List<Integer>, List<Integer>> result 属性子集-资源子集（对象子集）的一个map
-	 * */
+	 */
 	public static Map<List<Integer>, List<Integer>> objInterList(List<List<Integer>> attrSubSetlist,
 			List<Map<Integer, List<Integer>>> attrObjList) {
 		Map<List<Integer>, List<Integer>> result = new HashMap<List<Integer>, List<Integer>>();
@@ -175,7 +172,7 @@ public class Tools {
 		return result;
 	}
 
-	//冗余去除
+	// 冗余去除
 	public static Map<List<Integer>, List<Integer>> reduceObjAttr(Map<List<Integer>, List<Integer>> processSrc) {
 		Map<List<Integer>, List<Integer>> result = new HashMap<List<Integer>, List<Integer>>();
 		List<Integer> tmpKey = new ArrayList<Integer>();
@@ -233,7 +230,7 @@ public class Tools {
 		return result;
 	}
 
-	//添加上界和下界
+	// 添加上界和下界
 	public static Map<List<Integer>, List<Integer>> addFullConcep(int attrNum, int objNum) {
 		Map<List<Integer>, List<Integer>> fullConcept = new HashMap<List<Integer>, List<Integer>>();
 		List<Integer> fullAttr = new ArrayList<Integer>();
@@ -250,22 +247,25 @@ public class Tools {
 		fullConcept.put(nullLi, fullAttr);
 		return fullConcept;
 	}
-	
-	//寻找节点之间的关系
+
+	// 寻找节点之间的关系
 	public static Map<Map<Integer, List<Integer>>, Map<List<Integer>, List<Integer>>> findFather(
 			Map<List<Integer>, List<Integer>> src) {
-		Map<Map<Integer, List<Integer>>, Map<List<Integer>, List<Integer>>> result = new HashMap<Map<Integer, List<Integer>>, Map<List<Integer>, List<Integer>>>();
-		Map<Integer, Set<Integer>> storeObjAll = new HashMap<Integer, Set<Integer>>();
-		Map<Integer, List<Integer>> storeAttrAll = new HashMap<Integer, List<Integer>>();
-		Set<Integer> storeObjSet = new HashSet<Integer>();
-		int tmpkey = 0;
-		int tmpValNum = 0;
+		Map<Map<Integer, List<Integer>>, Map<List<Integer>, List<Integer>>> result = 
+				new HashMap<Map<Integer, List<Integer>>, Map<List<Integer>, List<Integer>>>();	// 保存结果集<<节点ID-父节点集>,<对象集list-属性集list>>
+		Map<Integer, Set<Integer>> storeObjAll = new HashMap<Integer, Set<Integer>>(); 			// 保存所有的对象的列表<ID-对象集>
+		Map<Integer, List<Integer>> storeAttrAll = new HashMap<Integer, List<Integer>>(); 		// 保存所有属性的列表
+		Set<Integer> storeObjSet = new HashSet<Integer>(); 										// 保存对象的集合
+		int tmpkey = 0; 			// 对象ID
+		int tmpValNum = 0; 			// 属性集的ID
+
+		// 遍历整个传进来的对象属性Map
 		for (Entry<List<Integer>, List<Integer>> entry : src.entrySet()) {
 			List<Integer> tmp = new ArrayList<Integer>();
 			List<Integer> tmpval = new ArrayList<Integer>();
 			Set<Integer> tmpSet = new HashSet<Integer>();
-			tmp = entry.getKey();
-			tmpval = entry.getValue();
+			tmp = entry.getKey(); 			// 对象集
+			tmpval = entry.getValue(); 		// 属性集
 			tmpValNum++;
 			storeAttrAll.put(tmpValNum, tmpval);
 			for (int m = 0; m < tmp.size(); m++) {
@@ -278,22 +278,24 @@ public class Tools {
 			storeObjSet.clear();
 		}
 
+		// 寻找父节点
 		for (int i = 0; i < storeObjAll.size(); i++) {
-			List<Integer> tmpFather = new ArrayList<Integer>();
-			Map<Integer, List<Integer>> numAndFather = new HashMap<Integer, List<Integer>>();
-			Map<List<Integer>, List<Integer>> concep = new HashMap<List<Integer>, List<Integer>>();
-			Set<Integer> tmpSetp = new HashSet<Integer>();
+			List<Integer> tmpFather = new ArrayList<Integer>(); 										// 父Grid节点列表
+			Map<Integer, List<Integer>> numAndFather = new HashMap<Integer, List<Integer>>();			// 当前节点和父节点的Map
+			Map<List<Integer>, List<Integer>> concep = new HashMap<List<Integer>, List<Integer>>(); 	// 对象和属性的Map
+			Set<Integer> tmpSetp = new HashSet<Integer>();	//存储ID为index+1的对象集
 			tmpSetp.addAll(storeObjAll.get(i + 1));
+			//遍历storeObjAll，从里面寻找父节点集
 			for (int j = 0; j < storeObjAll.size(); j++) {
-				if (!(storeObjAll.get(j + 1).equals(tmpSetp))) {
-					if (storeObjAll.get(j + 1).containsAll(tmpSetp)) {
-						if (storeObjAll.get(j + 1).size() - tmpSetp.size() == 1) {
+				if (!(storeObjAll.get(j + 1).equals(tmpSetp))) {		//避开同一个ID对应的对象集的情况
+					if (storeObjAll.get(j + 1).containsAll(tmpSetp)) {	//如果包含tmpSetp
+						if (storeObjAll.get(j + 1).size() - tmpSetp.size() == 1) {	//且集合的size值只小1，则为该节点的父节点
 							tmpFather.add(j + 1);
-						} else if (storeObjAll.get(j + 1).size() - tmpSetp.size() > 1) {
+						} else if (storeObjAll.get(j + 1).size() - tmpSetp.size() > 1) {//若size的值差大于1
 							int compareNum = 0;
 							for (int k = 0; k < storeObjAll.size(); k++) {
 								if (!(storeObjAll.get(k + 1).equals(storeObjAll.get(j + 1)))
-										&& !(storeObjAll.get(k + 1).equals(tmpSetp))) {
+										&& !(storeObjAll.get(k + 1).equals(tmpSetp))) {		//避开同一个ID对应的对象集的情况，且避开storeObjAll.get(j + 1)与
 									if (!(storeObjAll.get(k + 1).containsAll(tmpSetp)
 											&& storeObjAll.get(j + 1).containsAll(storeObjAll.get(k + 1)))) {
 										compareNum++;
@@ -316,7 +318,7 @@ public class Tools {
 			for (Integer val : tmpSetp) {
 				setToList.add(val);
 			}
-			concep.put(setToList, storeAttrAll.get(i + 1));
+			concep.put(setToList, storeAttrAll.get(i + 1));	//对象集-属性集
 			result.put(numAndFather, concep);
 
 		}
