@@ -7,11 +7,12 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import Domain.ConceptLatticeGrid;
+import Domain.SearchStatus;
 import Domain.WeChatMessage;
 import FacetTermExtractorModel.FacetTermExtractor;
 import FacetTermExtractorModel.Impl.BasedOnFrequencyFacetTermExtractorImpl;
-import HierarchicalRelationshipModel.HierarchicalRelationshipTool;
-import HierarchicalRelationshipModel.Impl.HierarchicalRelationshipToolImpl;
+import NavigationModel.HierarchicalRelationshipTool;
+import NavigationModel.Impl.HierarchicalRelationshipToolImpl;
 import WordSplitModel.ChineseTextSegmentation;
 import WordSplitModel.Impl.RMMWordSegmentationImpl;
 import DataProcessModel.DataPreprocessor;
@@ -25,7 +26,7 @@ public class client {
 	private static HashMap<String,HashSet<Integer>> facetTermOnDocIDs;				//存放<术语-ID>的一个HashMap
 	private static HashMap<Integer,HashSet<String>> docIDOnFacets;					//存放<文档ID-术语>的一个HashMap
 	private static ArrayList<ArrayList<ConceptLatticeGrid>> conceptLatticeGrid; 	//保存概念格
-	
+	private static SearchStatus searchStatus;
 	
 	public static void main(String[] args) {
 		

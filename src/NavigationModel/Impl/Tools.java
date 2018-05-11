@@ -1,4 +1,4 @@
-package HierarchicalRelationshipModel.Impl;
+package NavigationModel.Impl;
 
 import java.io.BufferedReader;
 import java.io.File;

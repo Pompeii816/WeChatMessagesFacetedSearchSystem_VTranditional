@@ -1,4 +1,4 @@
-package HierarchicalRelationshipModel.Impl;
+package NavigationModel.Impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import java.util.Set;
 
 import Domain.ConceptLatticeGrid;
 import Domain.WeChatMessage;
-import HierarchicalRelationshipModel.HierarchicalRelationshipTool;
+import NavigationModel.HierarchicalRelationshipTool;
 
 /* 
  * author:Pompeii
@@ -111,6 +111,7 @@ public class OtherHierachicalRelationshipToolImpl implements HierarchicalRelatio
 		return resultSet;		
 	}
 	
+	@SuppressWarnings("unused")
 	private static Map<Map<Integer, List<Integer>>, Map<List<Integer>, List<Integer>>> findFather(Map<List<Integer>,List<Integer>> src){  
         Map<Map<Integer,List<Integer>>,Map<List<Integer>,List<Integer>>> result = new HashMap<Map<Integer,List<Integer>>,Map<List<Integer>,List<Integer>>>();  
         Map<Integer,Set<Integer>> storeObjAll = new HashMap<Integer,Set<Integer>>();  

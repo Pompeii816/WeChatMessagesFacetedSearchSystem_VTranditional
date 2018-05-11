@@ -1,0 +1,7 @@
+package FacetTermsRelationshipModel.Impl;
+
+import FacetTermsRelationshipModel.FacetTermsRelationshipTool;
+
+public class FacetTermsRelationshipToolImpl implements FacetTermsRelationshipTool{
+
+}

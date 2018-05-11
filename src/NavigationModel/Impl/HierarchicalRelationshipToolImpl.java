@@ -1,4 +1,4 @@
-package HierarchicalRelationshipModel.Impl;
+package NavigationModel.Impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import Domain.ConceptLatticeGrid;
 import Domain.WeChatMessage;
-import HierarchicalRelationshipModel.HierarchicalRelationshipTool;
+import NavigationModel.HierarchicalRelationshipTool;
 
 /*
  * author:Pompeii
