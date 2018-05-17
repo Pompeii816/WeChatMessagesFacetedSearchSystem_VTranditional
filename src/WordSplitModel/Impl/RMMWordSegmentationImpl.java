@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -23,6 +22,7 @@ import WordSplitModel.ChineseTextSegmentation;
  * 输入：HashMap<ID,Message>的一个微信消息对象Map
  * 创新：借用了MySQL的InnoDB存储引擎的全文索引的使用StopWord表格的思想，将某些词汇禁止了，不让其作为分词后的结果出现
  * 完成度：100%
+ * 测试：通过
  * */
 public class RMMWordSegmentationImpl implements ChineseTextSegmentation {
 
@@ -73,16 +73,16 @@ public class RMMWordSegmentationImpl implements ChineseTextSegmentation {
 	// 获取禁用字典
 	@SuppressWarnings("resource")
 	private Set<String> getStopWord() throws IOException {
-		Set<String> stopword = new HashSet<String>();
+		Set<String> dictionary = new HashSet<String>();
 		String filename = "stopword.txt";
 		BufferedReader br = new BufferedReader(new FileReader(filename));
-		String tmp = "";
-		while (br.readLine() != null) {
+		String tmp;
+		while ((tmp = br.readLine()) != null) {
 			String[] token = tmp.split(",");
 			String word = token[0];
-			stopword.add(word);
+			dictionary.add(word);
 		}
-		return stopword;
+		return dictionary;
 	}
 
 	@SuppressWarnings("unused")
@@ -95,13 +95,12 @@ public class RMMWordSegmentationImpl implements ChineseTextSegmentation {
 		// 将结果按顺序输出
 		String[] token = m_sResult.split("/");
 		List<String> result = new ArrayList<String>();
-		for (int i = token.length - 1; i > 0; i--) {
-			if (stopword.contains(token[i])) {
 
-			} else {
-				result.add(token[i]);
-			}
+		for (int i = token.length - 1; i > 0; i--) {
+			result.add(token[i]);
 		}
+
+		m_sResult = "";
 		return result;
 	}
 
@@ -144,22 +143,20 @@ public class RMMWordSegmentationImpl implements ChineseTextSegmentation {
 	@Override
 	public List<String> getWordSegmentation(HashMap<Integer, WeChatMessage> messageMap) {
 		List<String> resultList = new ArrayList<String>();
-		Iterator<Entry<Integer, WeChatMessage>> iter = messageMap.entrySet().iterator();
-		HashMap<String, Integer> tmpMap = new HashMap<String, Integer>();
-		while (iter.hasNext()) {
-			Entry<Integer, WeChatMessage> entry = iter.next();
-			resultList.addAll(RMMSegment(entry.getValue().getMessageText()));
-			// entry.getValue().setMessageParticiple();
-			for (String element : RMMSegment(entry.getValue().getMessageText())) {
-				if (tmpMap.containsKey(element)) {
-					tmpMap.replace(element, tmpMap.get(element) + 1);
-				} else {
-					tmpMap.put(element, 1);
-				}
-			}
-			entry.getValue().setMessageParticiple(tmpMap);
-			tmpMap.clear();
+		String str = "";
+		for (Entry<Integer, WeChatMessage> entry : messageMap.entrySet()) {
+			str = str + "，" + entry.getValue().getMessageText();
+			entry.getValue().setMessageParticipleList(RMMSegment(entry.getValue().getMessageText()));
 		}
+		List<String> tmpList = RMMSegment(str);
+		for (int index = 0; index < tmpList.size(); index++) {
+			if (stopword.contains(tmpList.get(index))) {
+
+			} else {
+				resultList.add(tmpList.get(index));
+			}
+		}
+		System.out.println(stopword);
 		return resultList;
 	}
 }

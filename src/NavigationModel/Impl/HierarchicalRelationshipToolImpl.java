@@ -3,8 +3,6 @@ package NavigationModel.Impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 import Domain.ConceptLatticeGrid;
 import Domain.WeChatMessage;
@@ -20,6 +18,15 @@ import NavigationModel.HierarchicalRelationshipTool;
  * 是否已测试：否
  * */
 public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshipTool {
+
+	@Override
+	public ArrayList<ConceptLatticeGrid> getHierarchicalRelationship(
+			HashMap<Integer, WeChatMessage> messageMap, HashMap<String, HashSet<Integer>> facetTermOnDocIDs,
+			HashMap<Integer, HashSet<String>> docIDOnFacets) {
+
+		return null;
+	}
+	/*
 
 	@Override
 	public ArrayList<ArrayList<ConceptLatticeGrid>> getHierarchicalRelationship(
@@ -121,7 +128,7 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 			}else {
 				index++; //将index+1，则会重新对这一层进行这一波操作
 			}
-			*/
+			
 		}
 		
 		//去除List里面空着的层.
@@ -203,4 +210,5 @@ public class HierarchicalRelationshipToolImpl implements HierarchicalRelationshi
 		}
 		return resultMap;
 	}
+	*/
 }

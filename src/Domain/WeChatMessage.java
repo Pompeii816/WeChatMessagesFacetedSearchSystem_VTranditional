@@ -1,6 +1,7 @@
 package Domain;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Pompeii
@@ -14,6 +15,7 @@ public class WeChatMessage {
 	private String MessageText;							  //消息的文本
 	private int MessageType;							  //目前只使用文本，该类型留作扩展
 	private HashMap<String,Integer> MessageParticiple;    //分词和分词的该分词的数量
+	private List<String> MessageParticipleList;
 	
 	public WeChatMessage() {
 		
@@ -21,13 +23,15 @@ public class WeChatMessage {
 	
 	public WeChatMessage(int id,String senderId,
 			String sendTime,String MessageText,
-			int MessageType,HashMap<String,Integer> MessageParticiple) {
+			int MessageType,HashMap<String,Integer> MessageParticiple,
+			List<String> MessageParticipleList) {
 		this.ID = id;
 		this.SenderID = senderId;
 		this.SendingTime = sendTime;
 		this.MessageText = MessageText;
 		this.MessageType = MessageType;
 		this.MessageParticiple = MessageParticiple;
+		this.MessageParticipleList = MessageParticipleList;
 	}
 
 	public int getID() {
@@ -78,9 +82,19 @@ public class WeChatMessage {
 		MessageParticiple = messageParticiple;
 	}
 
+	public List<String> getMessageParticipleList() {
+		return MessageParticipleList;
+	}
+
+	public void setMessageParticipleList(List<String> messageParticipleList) {
+		MessageParticipleList = messageParticipleList;
+	}
+
 	@Override
 	public String toString() {
 		return "WeChatMessage [ID=" + ID + ", SenderID=" + SenderID + ", SendingTime=" + SendingTime + ", MessageText="
-				+ MessageText + ", MessageType=" + MessageType + ", MessageParticiple=" + MessageParticiple + "]";
+				+ MessageText + ", MessageType=" + MessageType + ", MessageParticiple=" + MessageParticiple
+				+ ", MessageParticipleList=" + MessageParticipleList + "]";
 	}
+	
 }

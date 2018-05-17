@@ -1,19 +1,18 @@
 package Domain;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public class ConceptLatticeGrid {
 	private int ID;
-	private HashSet<String> quest;
-	private HashSet<Integer> resourcesIds; 
-	private ArrayList<ConceptLatticeGrid> fatherGrid;
-	private ArrayList<ConceptLatticeGrid> childGrid;
+	private ArrayList<String> quest;
+	private ArrayList<Integer> resourcesIds; 
+	private ArrayList<Integer> fatherGrid;
+	private ArrayList<Integer> childGrid;
 	
 	public ConceptLatticeGrid(int ID,
-			HashSet<String> facetTermsName, HashSet<Integer> resourcesIds,
-			ArrayList<ConceptLatticeGrid> childGrid,
-			ArrayList<ConceptLatticeGrid> fatherGrid) {
+			ArrayList<String> facetTermsName, ArrayList<Integer> resourcesIds,
+			ArrayList<Integer> childGrid,
+			ArrayList<Integer> fatherGrid) {
 		super();
 		this.ID = ID;
 		this.quest = facetTermsName;
@@ -26,35 +25,35 @@ public class ConceptLatticeGrid {
 		super();
 	}
 
-	public HashSet<String> getQuest() {
+	public ArrayList<String> getQuest() {
 		return quest;
 	}
 
-	public void setQuest(HashSet<String> facetTermsName) {
+	public void setQuest(ArrayList<String> facetTermsName) {
 		this.quest = facetTermsName;
 	}
 
-	public HashSet<Integer> getResourcesIds() {
+	public ArrayList<Integer> getResourcesIds() {
 		return resourcesIds;
 	}
 
-	public void setResourcesIds(HashSet<Integer> resourcesIds) {
+	public void setResourcesIds(ArrayList<Integer> resourcesIds) {
 		this.resourcesIds = resourcesIds;
 	}
 
-	public ArrayList<ConceptLatticeGrid> getChildGrid() {
+	public ArrayList<Integer> getChildGrid() {
 		return childGrid;
 	}
 
-	public void setChildGrid(ArrayList<ConceptLatticeGrid> childGrid) {
+	public void setChildGrid(ArrayList<Integer> childGrid) {
 		this.childGrid = childGrid;
 	}
 
-	public ArrayList<ConceptLatticeGrid> getFatherGrid() {
+	public ArrayList<Integer> getFatherGrid() {
 		return fatherGrid;
 	}
 
-	public void setFatherGrid(ArrayList<ConceptLatticeGrid> fatherGrid) {
+	public void setFatherGrid(ArrayList<Integer> fatherGrid) {
 		this.fatherGrid = fatherGrid;
 	}
 

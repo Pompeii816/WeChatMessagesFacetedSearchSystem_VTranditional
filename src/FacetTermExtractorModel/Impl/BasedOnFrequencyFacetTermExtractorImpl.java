@@ -16,7 +16,7 @@ import FacetTermExtractorModel.FacetTermExtractor;
  * 输入：List<String> segmentations
  * 输出：
  * 完成度：100%
- * 是否已测试：否
+ * 是否已测试：已通过测试
  * */
 
 public class BasedOnFrequencyFacetTermExtractorImpl implements FacetTermExtractor{
@@ -47,7 +47,7 @@ public class BasedOnFrequencyFacetTermExtractorImpl implements FacetTermExtracto
 		
 		HashMap<String,Float> resultMap = new HashMap<String,Float>();
 		
-		for(int i = 0; i < segmentations.size() / 5;i++) {
+		for(int i = 0; i < segmentations.size() && i < 10; i++) {
 			float maxValue = Float.MIN_VALUE;
 			String str = null;
 			Iterator<Entry<String,Float>> iterOfTmp = tmpMap.entrySet().iterator();
@@ -78,6 +78,19 @@ public class BasedOnFrequencyFacetTermExtractorImpl implements FacetTermExtracto
 		HashMap<String, Float> tmpMap = getTerms(segmentations);
 		HashMap<String, HashSet<Integer>> resultMap = new HashMap<String, HashSet<Integer>>();
 		
+		for(Entry<String, Float> entryOfTmpMap:tmpMap.entrySet()) {
+			List<String> tmpList = null;
+			HashSet<Integer> tmpSet = new HashSet<Integer>();
+			for(Entry<Integer,WeChatMessage> entry:messageMap.entrySet()) {
+				tmpList = entry.getValue().getMessageParticipleList();
+				if(tmpList.contains(entryOfTmpMap.getKey())) {
+					tmpSet.add(entry.getKey());
+				}
+			}
+			resultMap.put(entryOfTmpMap.getKey(), tmpSet);
+		}
+		
+		/*
 		Iterator<Entry<String,Float>> iterOfTmp = tmpMap.entrySet().iterator();
 		while (iterOfTmp.hasNext()) {
 			Entry<String,Float> entryOfTmp = iterOfTmp.next();
@@ -100,6 +113,7 @@ public class BasedOnFrequencyFacetTermExtractorImpl implements FacetTermExtracto
 				}
 			}
 		}
+		*/
 		
 		return resultMap;
 	}
@@ -111,6 +125,25 @@ public class BasedOnFrequencyFacetTermExtractorImpl implements FacetTermExtracto
 		HashMap<String, Float> tmpMap = getTerms(segmentations);
 		HashMap<Integer, HashSet<String>> resultMap = new HashMap<Integer, HashSet<String>>();
 		
+		
+		for(Entry<Integer,WeChatMessage> entryOfMessageMap:messageMap.entrySet()) {
+			HashSet<String> tmpSet = new HashSet<String>();
+			List<String> tmpList = null;
+			tmpList = entryOfMessageMap.getValue().getMessageParticipleList();
+			for(Entry<String, Float> entryOfTmpMap:tmpMap.entrySet()) {
+				if(tmpList.contains(entryOfTmpMap.getKey())) {
+					tmpSet.add(entryOfTmpMap.getKey());
+				}
+			}
+			
+			if(tmpSet.size() > 0) {
+				resultMap.put(entryOfMessageMap.getKey(), tmpSet);
+			}else {
+				
+			}
+		}
+		
+		/*
 		Iterator<Entry<Integer,WeChatMessage>> iterOfMessage = messageMap.entrySet().iterator();
 		while(iterOfMessage.hasNext()) {
 			Entry<Integer,WeChatMessage> entryOfMessage = iterOfMessage.next();
@@ -133,6 +166,7 @@ public class BasedOnFrequencyFacetTermExtractorImpl implements FacetTermExtracto
 				}
 			}
 		}
+		*/
 		return resultMap;
 	}
 }

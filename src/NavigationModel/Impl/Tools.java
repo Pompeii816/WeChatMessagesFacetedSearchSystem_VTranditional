@@ -176,36 +176,36 @@ public class Tools {
 	public static Map<List<Integer>, List<Integer>> reduceObjAttr(Map<List<Integer>, List<Integer>> processSrc) {
 		Map<List<Integer>, List<Integer>> result = new HashMap<List<Integer>, List<Integer>>();
 		List<Integer> tmpKey = new ArrayList<Integer>();
-		List<Integer> tmpVal = new ArrayList<Integer>();
+		List<Integer> tmpValue = new ArrayList<Integer>();
 		for (Entry<List<Integer>, List<Integer>> entry : processSrc.entrySet()) {
-			Map<List<Integer>, List<Integer>> resultA = new HashMap<List<Integer>, List<Integer>>();
+			Map<List<Integer>, List<Integer>> tmpMap = new HashMap<List<Integer>, List<Integer>>();
 			tmpKey.addAll(entry.getValue());
-			tmpVal.addAll(entry.getKey());
+			tmpValue.addAll(entry.getKey());
 
 			if (result.size() == 0) {
 				List<Integer> tmpKeys = new ArrayList<Integer>();
 				List<Integer> tmpVals = new ArrayList<Integer>();
 				tmpKeys.addAll(tmpKey);
-				tmpVals.addAll(tmpVal);
+				tmpVals.addAll(tmpValue);
 				result.put(tmpKeys, tmpVals);
 			} else {
-				resultA.putAll(result);
-				int resLen = resultA.size();
+				tmpMap.putAll(result);
+				int resLen = tmpMap.size();
 				int tmpNum = 0;
-				for (Entry<List<Integer>, List<Integer>> resA : resultA.entrySet()) {
+				for (Entry<List<Integer>, List<Integer>> resA : tmpMap.entrySet()) {
 
-					if ((resA.getKey().equals(tmpKey)) && resA.getValue().size() < tmpVal.size()) {
+					if ((resA.getKey().equals(tmpKey)) && resA.getValue().size() < tmpValue.size()) {
 
 						List<Integer> tmpKeym = new ArrayList<Integer>();
 						List<Integer> tmpValm = new ArrayList<Integer>();
 						tmpKeym.addAll(tmpKey);
-						tmpValm.addAll(tmpVal);
+						tmpValm.addAll(tmpValue);
 						result.put(tmpKeym, tmpValm);
 
 						break;
 
 					}
-					if ((resA.getKey().equals(tmpKey)) && resA.getValue().size() >= tmpVal.size()) {
+					if ((resA.getKey().equals(tmpKey)) && resA.getValue().size() >= tmpValue.size()) {
 
 						break;
 					}
@@ -215,7 +215,7 @@ public class Tools {
 							List<Integer> tmpKeye = new ArrayList<Integer>();
 							List<Integer> tmpVale = new ArrayList<Integer>();
 							tmpKeye.addAll(tmpKey);
-							tmpVale.addAll(tmpVal);
+							tmpVale.addAll(tmpValue);
 							result.put(tmpKeye, tmpVale);
 
 						}
@@ -224,7 +224,7 @@ public class Tools {
 
 			}
 			tmpKey.clear();
-			tmpVal.clear();
+			tmpValue.clear();
 		}
 
 		return result;
@@ -326,3 +326,99 @@ public class Tools {
 	}
 
 }
+
+/*
+// 寻找节点之间的关系
+public static HashMap<HashMap<Integer, ArrayList<Integer>>, HashMap<ArrayList<Integer>, ArrayList<Integer>>> findFather(
+		HashMap<ArrayList<Integer>, ArrayList<Integer>> src) {
+	HashMap<HashMap<Integer, ArrayList<Integer>>, HashMap<ArrayList<Integer>, ArrayList<Integer>>> result = new HashMap<HashMap<Integer, ArrayList<Integer>>, HashMap<ArrayList<Integer>, ArrayList<Integer>>>(); // 保存结果集<<节点ID-父节点集>,<对象集list-属性集list>>
+	HashMap<Integer, HashSet<Integer>> storeObjAll = new HashMap<Integer, HashSet<Integer>>(); // 保存所有的对象的列表<ID-对象集>
+	HashMap<Integer, ArrayList<Integer>> storeAttrAll = new HashMap<Integer, ArrayList<Integer>>(); // 保存所有属性的列表
+	HashSet<Integer> storeObjSet = new HashSet<Integer>(); // 保存对象的集合
+	int tmpkey = 0; // 对象ID
+	int tmpValNum = 0; // 属性集的ID
+
+	// 遍历整个传进来的对象属性Map
+	for (Entry<ArrayList<Integer>, ArrayList<Integer>> entry : src.entrySet()) {
+		ArrayList<Integer> tmp = new ArrayList<Integer>();
+		ArrayList<Integer> tmpval = new ArrayList<Integer>();
+		HashSet<Integer> tmpSet = new HashSet<Integer>();
+		tmp = entry.getKey(); // 对象集
+		tmpval = entry.getValue(); // 属性集
+		tmpValNum++;
+		storeAttrAll.put(tmpValNum, tmpval);
+		for (int m = 0; m < tmp.size(); m++) {
+			storeObjSet.add(tmp.get(m));
+		}
+		tmpSet.addAll(storeObjSet);
+		tmpkey++;
+		storeObjAll.put(tmpkey, tmpSet);
+		tmp.clear();
+		storeObjSet.clear();
+	}
+
+	// 寻找父节点
+	for (int i = 0; i < storeObjAll.size(); i++) {
+		ArrayList<Integer> tmpFather = new ArrayList<Integer>(); // 父Grid节点列表
+		HashMap<Integer, ArrayList<Integer>> numAndFather = new HashMap<Integer, ArrayList<Integer>>(); // 当前节点和父节点的Map
+		HashMap<ArrayList<Integer>, ArrayList<Integer>> concep = new HashMap<ArrayList<Integer>, ArrayList<Integer>>(); // 对象和属性的Map
+		Set<Integer> tmpSetp = new HashSet<Integer>(); // 存储ID为index+1的对象集
+		tmpSetp.addAll(storeObjAll.get(i + 1));
+		// 遍历storeObjAll，从里面寻找父节点集
+		for (int j = 0; j < storeObjAll.size(); j++) {
+			if (!(storeObjAll.get(j + 1).equals(tmpSetp))) { // 避开同一个ID对应的对象集的情况
+				if (storeObjAll.get(j + 1).containsAll(tmpSetp)) { // 如果包含tmpSetp
+					if (storeObjAll.get(j + 1).size() - tmpSetp.size() == 1) { // 且集合的size值只小1，则为该节点的父节点
+						tmpFather.add(j + 1);
+					} else if (storeObjAll.get(j + 1).size() - tmpSetp.size() > 1) {// 若size的值差大于1
+						int compareNum = 0;
+						for (int k = 0; k < storeObjAll.size(); k++) {
+							if (!(storeObjAll.get(k + 1).equals(storeObjAll.get(j + 1)))
+									&& !(storeObjAll.get(k + 1).equals(tmpSetp))) { // 避开同一个ID对应的对象集的情况，且避开storeObjAll.get(j
+																					// + 1)与
+								if (!(storeObjAll.get(k + 1).containsAll(tmpSetp)
+										&& storeObjAll.get(j + 1).containsAll(storeObjAll.get(k + 1)))) {
+									compareNum++;
+								}
+							}
+
+						}
+						if (compareNum == (storeObjAll.size() - 2)) {
+							tmpFather.add(j + 1);
+						}
+					} else {
+						break;
+					}
+
+				}
+			}
+		}
+		numAndFather.put(i + 1, tmpFather);
+		ArrayList<Integer> setToList = new ArrayList<Integer>();
+		for (Integer val : tmpSetp) {
+			setToList.add(val);
+		}
+		concep.put(setToList, storeAttrAll.get(i + 1)); // 对象集-属性集
+		result.put(numAndFather, concep);
+
+	}
+	return result;
+}
+
+/*
+ * private static HashMap<HashMap<Integer, ArrayList<Integer>>,
+ * HashMap<ArrayList<Integer>, ArrayList<String>>> getRelationship(
+ * HashMap<ArrayList<String>, ArrayList<Integer>> attributes_Resouces){
+ * HashMap<HashMap<Integer, ArrayList<Integer>>, HashMap<ArrayList<Integer>,
+ * ArrayList<String>>> result = new HashMap<HashMap<Integer,
+ * ArrayList<Integer>>, HashMap<ArrayList<Integer>, ArrayList<String>>>(); //
+ * 保存结果集<<节点ID-父节点集>,<对象集list-属性集list>> HashMap<Integer, HashSet<Integer>>
+ * storeObjAll = new HashMap<Integer, HashSet<Integer>>(); // 保存所有的对象的列表<ID-对象集>
+ * HashMap<Integer, ArrayList<Integer>> storeAttrAll = new HashMap<Integer,
+ * ArrayList<Integer>>(); // 保存所有属性的列表 HashSet<Integer> storeObjSet = new
+ * HashSet<Integer>(); // 保存对象的集合 int tmpkey = 0; // 对象ID int tmpValNum = 0; //
+ * 属性集的ID
+ * 
+ * return result; }
+ */
+

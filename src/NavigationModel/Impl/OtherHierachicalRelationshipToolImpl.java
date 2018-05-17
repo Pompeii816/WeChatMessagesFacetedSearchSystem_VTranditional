@@ -3,11 +3,6 @@ package NavigationModel.Impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import Domain.ConceptLatticeGrid;
 import Domain.WeChatMessage;
@@ -24,6 +19,15 @@ import NavigationModel.HierarchicalRelationshipTool;
 
 public class OtherHierachicalRelationshipToolImpl implements HierarchicalRelationshipTool{
 
+	@Override
+	public ArrayList<ConceptLatticeGrid> getHierarchicalRelationship(
+			HashMap<Integer, WeChatMessage> messageMap, HashMap<String, HashSet<Integer>> facetTermOnDocIDs,
+			HashMap<Integer, HashSet<String>> docIDOnFacets) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
 	@Override
 	public ArrayList<ArrayList<ConceptLatticeGrid>> getHierarchicalRelationship(HashMap<Integer, WeChatMessage> messageMap,
 			HashMap<String, HashSet<Integer>> facetTermOnDocIDs, 
@@ -82,7 +86,7 @@ public class OtherHierachicalRelationshipToolImpl implements HierarchicalRelatio
 	 * 那么一个集合的子集合都可以用二进制表示，
 	 * 假设集合为{1,2,3}，
 	 * 那么可以用下列二级制表示：000,001,010,011......共有2^n种表示。
-	 * */
+	 * 
 	private static HashSet<HashSet<Integer>> getSubSet(HashMap<Integer, HashSet<String>> docIDOnFacets){
 		HashSet<HashSet<Integer>> resultSet = new HashSet<HashSet<Integer>>();
 		ArrayList<Integer> tmpList = new ArrayList<Integer>();
@@ -183,4 +187,5 @@ public class OtherHierachicalRelationshipToolImpl implements HierarchicalRelatio
          }  
         return result;  
     } 
+    */
 }
