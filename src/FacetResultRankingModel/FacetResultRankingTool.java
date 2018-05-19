@@ -1,9 +1,10 @@
 package FacetResultRankingModel;
 
-import java.util.HashMap;
-import Domain.SearchStatus;
+import java.util.ArrayList;
+import java.util.List;
+
 import Domain.WeChatMessage;
 
 public interface FacetResultRankingTool {
-	public HashMap<WeChatMessage,Float> rankingFacetResult(HashMap<Integer,WeChatMessage> weChatMessage,SearchStatus searchStatus);
+	public ArrayList<WeChatMessage> rankingFacetResult(List<WeChatMessage> messageList,List<String> searchList);
 }
