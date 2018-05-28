@@ -27,30 +27,38 @@ public class FacetTermsRelationshipToolImpl implements FacetTermsRelationshipToo
 	 * messageMap
 	 */
 	@Override
-	public ArrayList<FacetTerms> getFacetTermsRelationship(List<String> segmentations,
+	public ArrayList<FacetTerms> getFacetTermsRelationship(
+			List<String> segmentations,
 			HashMap<Integer, WeChatMessage> messageMap) {
 		ArrayList<FacetTerms> reusltList = new ArrayList<FacetTerms>();
-		for (String element : segmentations) {
-			FacetTerms tmpFacetTerms = new FacetTerms();
-			tmpFacetTerms.setFacetTerm(element);
-			reusltList.add(tmpFacetTerms);
-		}
 		try {
 			Set<String> set = loadFile();
 			for(Entry<Integer, WeChatMessage> entry:messageMap.entrySet()) {
-				ArrayList<String> tmpList = new ArrayList<String>();
-				for(String element:set) {
-					if(entry.getValue().getMessageParticipleList().contains(element)) {
-						for(String str:segmentations) {
-							if(entry.getValue().getMessageParticipleList().contains(str)) {
-								tmpList.add(str);
-							}
-						}
-						if(tmpList.size() > 1) {
-							for(String ele:tmpList) {
-								if(entry.getValue().getMessageParticipleList().indexOf(element) 
-										> entry.getValue().getMessageParticipleList().indexOf(ele)) {
-									
+				if(entry.getValue().getMessageParticipleList().size() >= 3) {
+					boolean flag = true;
+					for(int index = 0; index < entry.getValue().getMessageParticipleList().size(); 
+							index++) {
+						if(segmentations.contains(entry.getValue().getMessageParticipleList().get(index))) {
+							for(int i = index + 1; flag && i < entry.getValue().getMessageParticipleList().size();
+									i++) {
+								if(entry.getValue().getMessageParticipleList().get(i).equals("£¬") 
+										|| entry.getValue().getMessageParticipleList().get(i).equals("¡£")) {
+									flag = false;
+								}
+								if(set.contains(entry.getValue().getMessageParticipleList().get(i))) {
+									for(int j = i + 1; j < entry.getValue().getMessageParticipleList().size(); j++) {
+										if(entry.getValue().getMessageParticipleList().get(j).equals("£¬") 
+												|| entry.getValue().getMessageParticipleList().get(j).equals("¡£")) {
+											flag = false;
+										}
+										if(segmentations.contains(entry.getValue().getMessageParticipleList().get(j))) {
+											FacetTerms tmp = 
+													new FacetTerms(entry.getValue().getMessageParticipleList().get(j));
+											tmp.setFacetTerm(entry.getValue().getMessageParticipleList().get(index));
+											reusltList.add(tmp);
+											segmentations.remove(entry.getValue().getMessageParticipleList().get(j));
+										}
+									}
 								}
 							}
 						}
@@ -59,6 +67,11 @@ public class FacetTermsRelationshipToolImpl implements FacetTermsRelationshipToo
 			}
 		}catch(IOException ex) {
 			
+		}
+		for (String element : segmentations) {
+			FacetTerms tmpFacetTerms = new FacetTerms();
+			tmpFacetTerms.setFacetTerm(element);
+			reusltList.add(tmpFacetTerms);
 		}
 		return reusltList;
 	}

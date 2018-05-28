@@ -47,7 +47,7 @@ public class BasedOnFrequencyFacetTermExtractorImpl implements FacetTermExtracto
 		
 		HashMap<String,Float> resultMap = new HashMap<String,Float>();
 		
-		for(int i = 0; i < segmentations.size() && i < 10; i++) {
+		for(int i = 0; i < segmentations.size() / 5 && i < 10; i++) {
 			float maxValue = Float.MIN_VALUE;
 			String str = null;
 			Iterator<Entry<String,Float>> iterOfTmp = tmpMap.entrySet().iterator();

@@ -28,5 +28,10 @@ public class FacetTerms {
 	public void setFatherFacetTerm(FacetTerms fatherFacetTerm) {
 		this.fatherFacetTerm = fatherFacetTerm;
 	}
+
+	@Override
+	public String toString() {
+		return "FacetTerms [facetTerm=" + facetTerm + "]";
+	}
 	
 }

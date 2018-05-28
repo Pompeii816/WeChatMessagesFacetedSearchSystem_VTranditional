@@ -85,6 +85,7 @@ public class RMMWordSegmentationImpl implements ChineseTextSegmentation {
 		return dictionary;
 	}
 
+	//切分字符串
 	@SuppressWarnings("unused")
 	private List<String> RMMSegment(String source) {
 		int len = totalMaxlen;
@@ -104,6 +105,7 @@ public class RMMWordSegmentationImpl implements ChineseTextSegmentation {
 		return result;
 	}
 
+	//获取字符串尾端的子字符串
 	private String getSubString(String source, int m_nPosIndex, int len) {
 
 		int startIndex = m_nPosIndex - len;
@@ -114,23 +116,27 @@ public class RMMWordSegmentationImpl implements ChineseTextSegmentation {
 		return sub;
 	}
 
+	//从字典中匹配
 	private void rmm(String source, int len, int frompos) {
 		if (m_nPosIndex < 0)
 			return;
-		String sub = getSubString(source, m_nPosIndex, len);
-		if (dictionary.contains(sub)) {
+		String sub = getSubString(source, m_nPosIndex, len);//获取字符串尾端的子字符串
+		if (dictionary.contains(sub)) {//dictionary字典中是否包含sub字符串
 			// 匹配成功
+			//m_nPosIndex:游标指针位置
+			//m_MaxLen:最大取词长
+			//totalMaxlen:总最大取词长
 			m_sResult += "/" + sub;
 			m_nPosIndex = m_nPosIndex - m_MaxLen;
 			m_MaxLen = totalMaxlen;
-			rmm(source, m_MaxLen, m_nPosIndex);
+			rmm(source, m_MaxLen, m_nPosIndex);//递归匹配
 		} else {
 			// 不匹配
 			if (m_MaxLen > 1) {
 				m_MaxLen = m_MaxLen - 1;
 				rmm(source, m_MaxLen, m_nPosIndex);
 			} else {
-				// m_sResult += "/字典中没有（" + sub + "）字";
+				// 字典中没有sub词;
 				m_sResult += "/" + sub;
 				m_nPosIndex -= 1;
 				m_MaxLen = totalMaxlen;
@@ -139,24 +145,26 @@ public class RMMWordSegmentationImpl implements ChineseTextSegmentation {
 		}
 	}
 
-	// 分词以后给每个消息添加上分词
+	// 分词以后给每个消息添加上分词，并且剔除在stopword中的词
 	@Override
-	public List<String> getWordSegmentation(HashMap<Integer, WeChatMessage> messageMap) {
+	public List<String> getWordSegmentation(HashMap<Integer, 
+			WeChatMessage> messageMap) {
 		List<String> resultList = new ArrayList<String>();
 		String str = "";
 		for (Entry<Integer, WeChatMessage> entry : messageMap.entrySet()) {
 			str = str + "，" + entry.getValue().getMessageText();
-			entry.getValue().setMessageParticipleList(RMMSegment(entry.getValue().getMessageText()));
+			entry.getValue().setMessageParticipleList(
+					RMMSegment(entry.getValue().getMessageText()));
+			//调用分词函数，对每个消息进行分词
 		}
 		List<String> tmpList = RMMSegment(str);
 		for (int index = 0; index < tmpList.size(); index++) {
 			if (stopword.contains(tmpList.get(index))) {
-
+				//如果stopword字典中包含该词则丢弃该词
 			} else {
 				resultList.add(tmpList.get(index));
 			}
 		}
-		System.out.println(stopword);
 		return resultList;
 	}
 }

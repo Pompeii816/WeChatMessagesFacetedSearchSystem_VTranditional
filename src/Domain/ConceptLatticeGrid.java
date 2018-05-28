@@ -67,8 +67,6 @@ public class ConceptLatticeGrid {
 
 	@Override
 	public String toString() {
-		return "ConceptLatticeGrid [ID=" + ID + ", quest=" + quest + ", resourcesIds=" + resourcesIds + ", fatherGrid="
-				+ fatherGrid + ", childGrid=" + childGrid + "]";
+		return quest + "";
 	}
-	
 }

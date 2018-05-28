@@ -17,7 +17,8 @@ public class Navigator implements HierarchicalRelationshipTool {
 
 	@Override
 	public ArrayList<ConceptLatticeGrid> getHierarchicalRelationship(
-			HashMap<Integer, WeChatMessage> messageMap, HashMap<String, HashSet<Integer>> facetTermOnDocIDs,
+			HashMap<Integer, WeChatMessage> messageMap, 
+			HashMap<String, HashSet<Integer>> facetTermOnDocIDs,
 			HashMap<Integer, HashSet<String>> docIDOnFacets) {
 		
 		ArrayList<String> attributesList = new ArrayList<String>();
@@ -70,7 +71,7 @@ public class Navigator implements HierarchicalRelationshipTool {
 						if (storeObjAll.get(j + 1).size() - tmpList.size() == 1) { // 且集合的size值只小1，则为该节点的父节点
 							tmpFather.add(j + 1);
 						} else if (storeObjAll.get(j + 1).size() - tmpList.size() > 1) {// 若size的值差大于1
-							int compareNum = 0;
+							int compareNum = 0;//j+1除了tmpList之外的子类的个数
 							for (int k = 0; k < storeObjAll.size(); k++) {
 								if (!(storeObjAll.get(k + 1).equals(storeObjAll.get(j + 1)))
 										&& !(storeObjAll.get(k + 1).equals(tmpList))) { // 避开同一个ID对应的对象集的情况，且避开storeObjAll.get(j
@@ -83,6 +84,7 @@ public class Navigator implements HierarchicalRelationshipTool {
 
 							}
 							if (compareNum == (storeObjAll.size() - 2)) {
+								//如果j+1这个概念格除了tmpList之外拥有的子类个数是资源个数 - 2个的话就判断该概念格是tmpList的直接父
 								tmpFather.add(j + 1);
 							}
 						} else {
@@ -92,10 +94,19 @@ public class Navigator implements HierarchicalRelationshipTool {
 					}
 				}
 			}
+			if(tmpFather.isEmpty()) {
+				tmpFather.add(1);
+			}
 			numAndFather.put(i + 1, tmpFather);
 			tmpConceptLatticeGrid.setID(i + 1);
 			tmpConceptLatticeGrid.setFatherGrid(tmpFather);
-			tmpConceptLatticeGrid.setQuest(storeAttrAll.get(i + 1));
+			if(storeAttrAll.get(i + 1) == null) {
+				ArrayList<String> s = new ArrayList<>();
+				s.add("#");
+				tmpConceptLatticeGrid.setQuest(s);
+			}else {
+				tmpConceptLatticeGrid.setQuest(storeAttrAll.get(i + 1));
+			}
 			tmpConceptLatticeGrid.setResourcesIds(tmpList);
 			ArrayList<Integer> setToList = new ArrayList<Integer>();
 			for (Integer val : tmpList) {
@@ -194,7 +205,8 @@ public class Navigator implements HierarchicalRelationshipTool {
 				int tmpNum = 0;
 				for (Entry<ArrayList<String>, ArrayList<Integer>> entryOfTmpMap : tmpMap.entrySet()) {
 
-					if ((entryOfTmpMap.getKey().equals(tmpKey)) && entryOfTmpMap.getValue().size() < tmpValue.size()) {// 若存在属性集包含于tmpMap内，且资源集大于tmpMap里面的资源集，则将该entry加进去
+					if ((entryOfTmpMap.getKey().equals(tmpKey)) 
+							&& entryOfTmpMap.getValue().size() < tmpValue.size()) {// 若存在属性集包含于tmpMap内，且资源集大于tmpMap里面的资源集，则将该entry加进去
 
 						ArrayList<String> tmpKeym = new ArrayList<String>();
 						ArrayList<Integer> tmpValm = new ArrayList<Integer>();
@@ -205,7 +217,8 @@ public class Navigator implements HierarchicalRelationshipTool {
 						break;
 
 					}
-					if ((entryOfTmpMap.getKey().equals(tmpKey)) && entryOfTmpMap.getValue().size() >= tmpValue.size()) {
+					if ((entryOfTmpMap.getKey().equals(tmpKey)) 
+							&& entryOfTmpMap.getValue().size() >= tmpValue.size()) {
 
 						break;
 					}
