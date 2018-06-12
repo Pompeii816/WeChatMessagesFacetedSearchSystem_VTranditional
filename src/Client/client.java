@@ -10,9 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,6 +25,8 @@ import javax.swing.tree.TreeNode;
 
 import Domain.ConceptLatticeGrid;
 import Domain.WeChatMessage;
+import FacetResultRankingModel.FacetResultRankingTool;
+import FacetResultRankingModel.Impl.FacetResultRankingToolImplByFrequency;
 import FacetTermExtractorModel.FacetTermExtractor;
 import FacetTermExtractorModel.Impl.BasedOnFrequencyFacetTermExtractorImpl;
 import NavigationModel.HierarchicalRelationshipTool;
@@ -51,6 +51,7 @@ public class client extends JFrame{
 	private static HashMap<Integer,HashSet<String>> docIDOnFacets;					//存放<文档ID-术语>的一个HashMap
 	private static ArrayList<ConceptLatticeGrid> conceptLatticeGrid; 	//保存概念格
 	private static SearchTool search;
+	private static FacetResultRankingTool facetResultRankingTool;
 	private JButton SearchButton;
     private JTree FacetTermsTree;
     private JTree NavigationTree;
@@ -90,26 +91,36 @@ public class client extends JFrame{
 					}
 				}
 				List<WeChatMessage> messageList = searchMessage(searList,search);
+				messageList = facetResultRankingTool.rankingFacetResult(messageList, searList);
 				FacetedSearchResult.setText("");
 				for(WeChatMessage element:messageList) {
-					FacetedSearchResult.append(element.getSenderID() + "\n");
-					FacetedSearchResult.append(element.getMessageText() + "\n");
+					Long timestamp = Long.parseLong(element.getSendingTime());  
+				    String date = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date(timestamp)); 
+					FacetedSearchResult.append("信息发送者： " + element.getSenderID() + "\n");
+					FacetedSearchResult.append("信息发送时间： " + date + "\n");
+					FacetedSearchResult.append("信息内容： " + "\n" + element.getMessageText() + "\n");
 				}
 				FacetTermsArea.setText("");
 				for(ConceptLatticeGrid element:conceptLatticeGrid) {
-					if(element.getQuest().containsAll(searList)) {
+					if(element.getQuest().containsAll(searList) && !element.getQuest().equals(searList)) {
 						for(String el:element.getQuest()) {
-							FacetTermsArea.append(el + ",");
+							if(element.getQuest().indexOf(el) == (element.getQuest().size() - 1)) {
+								FacetTermsArea.append(el + "\n");
+							}else {
+								FacetTermsArea.append(el + ",");
+							}
 						}
-						FacetTermsArea.append("\n");
 					}
 				}
 				for(ConceptLatticeGrid element:conceptLatticeGrid) {
-					if(searList.containsAll(element.getQuest())) {
+					if(searList.containsAll(element.getQuest()) && !element.getQuest().equals(searList)) {
 						for(String el:element.getQuest()) {
-							FacetTermsArea.append(el + ",");
+							if(element.getQuest().indexOf(el) == (element.getQuest().size() - 1)) {
+								FacetTermsArea.append(el + "\n");
+							}else {
+								FacetTermsArea.append(el + ",");
+							}
 						}
-						FacetTermsArea.append("\n");
 					}
 				}
 			}
@@ -276,6 +287,8 @@ public class client extends JFrame{
 			}
 			childConceptLatticeGridMap.put(element, tmpList);
 		}
+		
+		facetResultRankingTool = new FacetResultRankingToolImplByFrequency();
 		/*
 		System.out.println(childConceptLatticeGridMap.size());
 		for(Entry<ConceptLatticeGrid,ArrayList<ConceptLatticeGrid>> entry:childConceptLatticeGridMap.entrySet()) {
@@ -285,39 +298,12 @@ public class client extends JFrame{
 			}
 			System.out.println();
 		}
-		*/
-		
-		for(ConceptLatticeGrid element:conceptLatticeGrid) {
-			System.out.println(element.getID());
-			System.out.println(element.getFatherGrid());
-			System.out.println(element.getQuest());
-			System.out.println(element.getResourcesIds());
-			System.out.println(element.toString());
-		}
-		
-
-		ArrayList<String> searchList = new ArrayList<>();
-		
-		searchList.add("NBA");
-		searchList.add("东部");
+		*/		
 		
 		search = new SearchToolImpl();
-		
-		List<WeChatMessage> seL = search.searchMessageByFacet(searchList, messageMap, docIDOnFacets);
-		System.out.println(seL);
 		
 		@SuppressWarnings("unused")
 		client c = new client(conceptLatticeGrid, facetTerms);
 		
-		ArrayList<WeChatMessage> weChatMessageList = new ArrayList<WeChatMessage>();
-		Iterator<Entry<Integer, WeChatMessage>> iter = messageMap.entrySet().iterator();
-		while (iter.hasNext()) {
-			Entry<Integer, WeChatMessage> entry = iter.next();
-			weChatMessageList.add(entry.getValue());
-			System.out.println(entry.getValue().getMessageParticipleList());
-		}
-		
-		
-		System.out.println("这就是毕设！");
 	}
 }
